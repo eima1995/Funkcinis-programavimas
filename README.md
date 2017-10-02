@@ -1,6 +1,6 @@
 # Funkcinis-programavimas 
 
-##Functional programming task 1
+## Functional programming task 1
 Exercise 1. Similarly as it was done for the function exOr (see the Lecture 2 slides), deﬁne in Haskell two diﬀerent versions of a function nAnd :: Bool −> Bool −> Bool, which returns the result True in all cases except the one when both arguments are True. Moreover, deﬁne the third version of the function that encodes the truth table for this mathematical function. In other words, the literal values True and False should be used instead of both function arguments, resulting in four diﬀerent deﬁnition cases (equations).
 
 Exercise 2. Import the module Test.QuickCheck by adding the command ”import Test.QuickCheck” at the beginning of your module (after the keyword where). After that, test that all the three versions of nAnd from the previous exercise are functionally identical by deﬁning the corresponding properties of the type ::Bool−> Bool −> Bool and running quickCheck prop nAnd??? in the interpreter. Think of one more property that any implementation of nAnd must satisfy (for example, that it should return True if any of the arguments is False) and test it.
@@ -17,7 +17,7 @@ Exercise 7. Write a function mult::Integer−>Integer−>Integer that recursivel
 
 Exercise 8. Deﬁne a recursive function prod::Integer−>Integer−>Integer that, for the given numbers m and n, multiplies all the numbers from the range m..n. In other words, the produced result must be equal to m∗(m + 1)∗...∗(n−1)∗n Note that, to follow the primitive recursion pattern, it is not necessary to choose a single parameter in order to deﬁne the base and recursive cases. Any expression on the parameter values can be used instead, provided that, according to the pattern, this expression is checked to be equal to 0 for the base case, and be greater than 0 for the recursive case. Moreover, the recursive call should make this expression smaller by 1. An error message must be returned for an invalid range, i.e., when m > n. Finally, redeﬁne the factorial function (from the Lecture 2 slides) as a special case of prod.
 
-##Functional programming task 2
+## Functional programming task 2
 Exercise 1.
 Define a function
 average ::  [Float] -> Float,
