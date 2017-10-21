@@ -1,8 +1,8 @@
 module Ex3
 where
 import Data.Char
--- Ex1
 
+-- Ex1
 subst1 :: String -> String -> String -> String
 subst1 oldSub newSub st 
     |substring oldSub st == True = newSub ++ (subst oldSub st)
@@ -110,27 +110,65 @@ newLine (st:newSt) oldSt n
     | otherwise = error "Word exceeds the given line length"
 
 -- Ex5
-data Shape = Circle Float (Float,Float)| Rectangle Float Float (Int,Int) deriving (Show, Ord, Eq)
+data Shape = Circle Float (Int,Int)| Rectangle Float Float (Int,Int) deriving (Show, Ord, Eq)
 overlaps :: Shape -> Shape -> Bool
 
-{--
-overlaps (Rectangle w h (x,y)) (Rectangle w1 h1 (x1,y1)) = checkOverLap (coord(Rectangle w1 h1 (x,y))) (coord(Rectangle w h (x1,y1)))
 
+{--
+overlaps (Rectangle w h (x,y)) (Rectangle w1 h1 (x1,y1))
+    |
+	where
+	 l1x = x + h
+	 l2x = x1 + h1
+	 r1x = x + w 
+	 r2x = x1 + w
+	 l1y = y + h
+	 l2y = 
+--} 
+{-- kazkas negerai perdarit is tutorialo
+overlaps (Rectangle w h (x,y)) (Rectangle w1 h1 (x1,y1)) = checkOverLap (coord(Rectangle w1 h1 (x,y))) (coord(Rectangle w h (x1,y1)))
 checkOverLap :: (Float,Float,Float,Float) -> (Float,Float,Float,Float) -> Bool
 checkOverLap (x1,x2,x3,x4) (y1,y2,y3,y4)
     | (x1 <= y1 && x2 >= y1) || (x1 <= y2 && x2 >= y2) || (x3 <= y3 && x3 >= y3)|| (x3 <= y4 && x3 >= y4) = True
     | otherwise = False
 
 coord :: Shape -> (Float,Float,Float,Float)
-
-coord (Rectangle w h (x,y)) = ((fromIntegral x), (fromIntegral x)+w, (fromIntegral y), (fromIntegral y)+h) -- cia gali buti ir minus h
+coord (Rectangle w h (x,y)) = ((fromIntegral x), (fromIntegral x)+w, (fromIntegral y), (fromIntegral y)+h)
 --}
-
 overlaps (Circle r1 (x1,y1)) (Circle r2 (x2,y2))
-	|(x1-x2) * (x1-x2) +(y1-y2)*(y1-y2) < ((r1 + r2) * (r1 + r2)) = True
-	|otherwise = False
+    | distX + distY < ((r1 + r2) * (r1 + r2)) = True
+    |otherwise = False
+    where
+     distX = fromIntegral((x1-x2) * (x1-x2))
+     distY = fromIntegral((y1-y2)*(y1-y2))
+
+overlaps (Rectangle w h (x2,y2)) (Circle r (x1,y1)) = overlaps (Circle r (x1,y1)) (Rectangle w h (x2,y2))
+overlaps (Circle r (x1,y1)) (Rectangle w h (x2,y2))
+    |distX > (w/2 + r) = False
+    |distY > (h/2 + r) = False
+    |distX <= w/2 = True
+    |distY <= h/2 = True
+    |dx * dx + dy * dy <= r * r = False
+    where
+     distX = abs((fromIntegral x1) - (fromIntegral x2) - w/2)
+     distY = abs((fromIntegral y1) - (fromIntegral y2) - h/2)
+     dx = distX - w/2
+     dy = distY - h/2
+
+-- Ex6
+type Name = String
+type Id = Int 
+data Person = Person Name deriving (Show, Eq)
+data Book = Book Name Id deriving (Show, Eq)
+data Status = Loaned | Free | Locked deriving (Show, Eq)
+data Loan = Loan Id deriving (Show, Eq)
 
 
+loan :: Person -> Book -> ([Book],[Loan]) -> ([Book],[Loan])
+loan (Person name ) (Book bookName id) (xs, ys) = (xs, ys)
 
+-- loan (Person name) (Book bookName id stat) ([Book bookName1 id1 stat1], [loan]) = returnAllLoans(loan)
 
+-- loan (Person "eimantas") (Book "trys parsiukai" 1 Loaned) ([Book "parsiukas" 5 Loaned], [BookAndLoanStatus 10 Free])
 
+-- loan (Person "eimantas") (Book "trys parsiukai" 1) ([Book "parsiukas" 5, Book "parsiukas" 5 ], [Loan 10])
