@@ -52,7 +52,7 @@ whitespaces = ['\n', '\t', ' ']
 punctuation = ['.', ',', ';', '-', ':' ]
 spaces = whitespaces ++ punctuation
 
--- Ex3
+-- Ex3  //gale kad nepaskaiciuotu kaip zodzio
 count :: String -> (Int, Int, Int)
 count [] = (0,0,0)
 count st = (chars, words, lines)
@@ -95,7 +95,7 @@ getLinesNum (x:xs) num
 -- Ex4
 justify :: String -> Int -> String
 justify st n
-    | length(st) < n || n <= 0 = error "Incorect second parameter."
+    | length st < n || n <= 0 = error "Incorect second parameter."
     | otherwise = newLine newSt oldSt n
     where
         oldSt = take n st -- pradzia zodzio
@@ -107,15 +107,33 @@ newLine (st:newSt) oldSt n
     | elem st spaces = newLine (drop n newSt) (oldSt ++ "\n" ++ (take n newSt)) n
     | otherwise = error "Word exceeds the given line length"
 
+
 -- Ex5
--- overlaps (Circle 2 (2,2)) (Circle 2 (1,2)) --> True
--- overlaps (Rectangle 2 2 (1,1)) (Rectangle 2 2 (1,1))
--- overlaps (Circle 2 (2,2)) (Rectangle 2 2 (1,1)) --> True
--- overlaps (Circle 1 (5, 0)) (Circle 1 (3, 0)) --> False
+-- overlaps (Rectangle 2 2 (1,1)) (Rectangle 2 2 (1,1)) -> True
+-- overlaps (Rectangle 2 2 (1,1)) (Rectangle 2 2 (4,1)) -> False
+-- overlaps (Rectangle 2 2 (1,1)) (Rectangle 2 2 (3,3)) -> True
+-- overlaps (Rectangle 2 2 (1,1)) (Rectangle 2 2 (2,2)) -> True
+-- overlaps (Rectangle 2 2 (1,1)) (Rectangle 2 2 (3,0)) -> True
 -- overlaps (Rectangle 2 2 (2,2)) (Circle 2 (2,2)) -> True
 -- overlaps (Rectangle 2 2 (0,0)) (Circle 1 (4,0)) -> False
+-- overlaps (Circle 2 (2,2)) (Circle 2 (1,2)) --> True
+-- overlaps (Circle 2 (2,2)) (Rectangle 2 2 (1,1)) --> True
+-- overlaps (Circle 1 (5, 0)) (Circle 1 (3, 0)) --> False
 data Shape = Circle Float (Int,Int)| Rectangle Float Float (Int,Int) deriving (Show, Ord, Eq)
 overlaps :: Shape -> Shape -> Bool
+overlaps (Rectangle w h (x,y)) (Rectangle w1 h1 (x1,y1))
+    |l1x > r2x || l2x > r1x = False -- if one rectangle is on left side of other
+    |l1y < r2y || l2y < r1y = False -- if one rectangle is above other
+    |otherwise = True
+    where
+     l1x = fromIntegral x     -- l1 - top left coord
+     l1y = (fromIntegral y) + h 
+     r1x = (fromIntegral x) + w -- r1 - bootom right coord
+     r1y = fromIntegral y
+     l2x = fromIntegral x1
+     l2y = (fromIntegral y1) + h1
+     r2x = (fromIntegral x1) + w1
+     r2y = fromIntegral y1
 
 overlaps (Circle r1 (x1,y1)) (Circle r2 (x2,y2))
     | distX + distY < ((r1 + r2) * (r1 + r2)) = True
@@ -136,14 +154,6 @@ overlaps (Circle r (x1,y1)) (Rectangle w h (x2,y2))
      distY = abs((fromIntegral y1) - (fromIntegral y2) - h/2)
      dx = distX - w/2
      dy = distY - h/2
-
-overlaps (Rectangle w h (x,y)) (Rectangle w1 h1 (x1,y1)) = checkOverLap (coord(Rectangle w1 h1 (x,y))) (coord(Rectangle w h (x1,y1)))
-checkOverLap :: (Float,Float,Float,Float) -> (Float,Float,Float,Float) -> Bool
-checkOverLap (x1,x2,x3,x4) (y1,y2,y3,y4)
-    | (x1 <= y1 && x2 >= y1) || (x1 <= y2 && x2 >= y2) || (x3 <= y3 && x3 >= y3)|| (x3 <= y4 && x3 >= y4) = True
-    | otherwise = False
-coord :: Shape -> (Float,Float,Float,Float)
-coord (Rectangle w h (x,y)) = ((fromIntegral x), (fromIntegral x)+w, (fromIntegral y), (fromIntegral y)+h)
 
 -- Ex6
 -- loan (Person "Eimantas")(Book "knyga") ([(Book1 "knyga1" 81 Free),(Book1 "knyga" 45 Free),(Book1 "knyga2" 99 Loaned)],[Loan (Person "Tomas") (Book2 "knyga2" 99)])
