@@ -105,7 +105,7 @@ justify st n
 newLine :: String -> String -> Int -> String
 newLine [] oldSt n = oldSt
 newLine (st:newSt) oldSt n 
-    | elem st spaces = newLine (drop n oldSt) (oldSt ++ "\n" ++ (take n newSt)) n
+    | elem st spaces = newLine (drop n newSt) (oldSt ++ "\n" ++ (take n newSt)) n
     | otherwise = error "Word exceeds the given line length"
 
 -- Ex5
