@@ -3,17 +3,17 @@ where
 import Data.Char
 
 -- Ex1
-subst1 :: String -> String -> String -> String
-subst1 oldSub newSub st 
-    |substring oldSub st == True = newSub ++ (subst oldSub st)
-    |otherwise = subst oldSub st
+subst :: String -> String -> String -> String
+subst oldSub newSub st 
+    |substring oldSub st == True = newSub ++ (subst1 oldSub st)
+    |otherwise = subst1 oldSub st
 
-subst :: String -> String -> String
-subst [] st = st
-subst _ [] = []
-subst oldSub st 
-    | prefix oldSub st == True = subst oldSub (drop (length (oldSub))st)
-    | prefix oldSub st == False = head(st):(subst oldSub (tail(st)))
+subst1 :: String -> String -> String
+subst1 [] st = st
+subst1 _ [] = []
+subst1 oldSub st 
+    | prefix oldSub st == True = subst1 oldSub (drop (length (oldSub))st)
+    | prefix oldSub st == False = head(st):(subst1 oldSub (tail(st)))
  
 prefix :: String -> String -> Bool
 prefix[][] = True
@@ -52,7 +52,6 @@ punctuation = ['.', ',', ';', '-', ':' ]
 spaces = whitespaces ++ punctuation
 
 -- Ex3
--- \ - turi skaiciuoti??
 -- gale paskaiciuoja kaip zodi
 count :: String -> (Int, Int, Int)
 count [] = (0,0,0)
@@ -91,7 +90,7 @@ getLinesNum :: String -> Int -> Int
 getLinesNum [] num = num
 getLinesNum (x:xs) num
     | x /= '\n' = getLinesNum xs num
-    | otherwise = getLinesNum xs (num + 1) --cia pakeisti
+    | otherwise = getLinesNum xs (num + 1)
 
 -- Ex4 (figovai labas labas labas 5)
 justify :: String -> Int -> String
@@ -99,20 +98,19 @@ justify st n
     | length(st) < n || n <= 0 = error "Incorect second parameter."
     | otherwise = newLine newSt oldSt n
     where
-        oldSt = take n st
-        newSt = drop n st
+        oldSt = take n st -- pradzia zodzio
+        newSt = drop n st -- pabaiga zodzio
+
 
 newLine :: String -> String -> Int -> String
 newLine [] oldSt n = oldSt
-newLine (st:newSt) oldSt n
-    | (elem st spaces) && (length(newSt) - 1  <= n) = oldSt ++ "\n" ++ newSt
-    | elem st spaces = newLine (drop n newSt) (oldSt ++ "\n" ++ newSt) n
+newLine (st:newSt) oldSt n 
+    | elem st spaces = newLine (drop n oldSt) (oldSt ++ "\n" ++ (take n newSt)) n
     | otherwise = error "Word exceeds the given line length"
 
 -- Ex5
 data Shape = Circle Float (Int,Int)| Rectangle Float Float (Int,Int) deriving (Show, Ord, Eq)
 overlaps :: Shape -> Shape -> Bool
-
 
 {--
 overlaps (Rectangle w h (x,y)) (Rectangle w1 h1 (x1,y1))
