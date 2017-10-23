@@ -156,19 +156,40 @@ overlaps (Circle r (x1,y1)) (Rectangle w h (x2,y2))
      dy = distY - h/2
 
 -- Ex6
+-- loan (Person "Eimantas") (Book "knyga" 45) ([(Book1 "knyga" 45 Free),(Book1 "knyga1" 81 Free), (Book1 "knyga2" 99 Loaned)],[Loan (Person "Tomas") (Book "knyga2" 99)])
 type Name = String
 type Id = Int 
 data Person = Person Name deriving (Show, Eq)
-data Book = Book Name Id deriving (Show, Eq)
+data Book = Book Name Id | Book1 Name Id Status deriving (Show, Eq)
 data Status = Loaned | Free | Locked deriving (Show, Eq)
-data Loan = Loan Id deriving (Show, Eq)
+data Loan = Loan Person Book deriving (Show, Eq)
 
 
 loan :: Person -> Book -> ([Book],[Loan]) -> ([Book],[Loan])
-loan (Person name ) (Book bookName id) (xs, ys) = (xs, ys)
+loan person (Book bookName id) (xs, ys)
+    |goThroughBooks id xs  == True = (changeStatus id xs, addPerson person bookName id ys)
+    |otherwise = (xs, ys)
 
--- loan (Person name) (Book bookName id stat) ([Book bookName1 id1 stat1], [loan]) = returnAllLoans(loan)
+addPerson :: Person -> String -> Int -> [Loan] -> [Loan]
+addPerson person bookName id ys = (Loan person (Book bookName id)):ys
 
--- loan (Person "eimantas") (Book "trys parsiukai" 1 Loaned) ([Book "parsiukas" 5 Loaned], [BookAndLoanStatus 10 Free])
 
--- loan (Person "eimantas") (Book "trys parsiukai" 1) ([Book "parsiukas" 5, Book "parsiukas" 5 ], [Loan 10])
+changeStatus :: Int -> [Book] -> [Book]
+changeStatus _ [] = []
+changeStatus id (x:xs)
+    |findBook id x == False = [x] ++ (changeStatus id xs)
+    |otherwise = [(changeSt x)] ++ (changeStatus id xs)
+
+changeSt :: Book -> Book
+changeSt (Book1 name id1 st) = (Book1 name id1 Loaned)
+
+goThroughBooks :: Int -> [Book] -> Bool
+goThroughBooks _ [] = False
+goThroughBooks id (y:ys)
+    |findBook id y  == False = goThroughBooks id ys
+    |otherwise = True
+
+findBook :: Int -> Book -> Bool
+findBook id (Book1 name id1 st)
+    |((id == id1) && (st == Free)) = True
+    |otherwise = False
