@@ -22,7 +22,7 @@ dividers (x) y
    | otherwise = dividers x (y-1)
 
 divides2:: Integer -> [Integer]
-divides2 x = [ y | y <- [1..x], mod x y == 0]
+divides2 x = [ y | y <- [1..x 'div' 2] ++ [x] , mod x y == 0]
 
 isPrime :: Integer -> Bool
 isPrime x 
@@ -31,7 +31,7 @@ isPrime x
 
 -- Ex3
 prefix :: String -> String -> Bool
-prefix[][] = True
+-- prefix[][] = True
 prefix [] _ = True
 prefix _ [] = False
 prefix (x:xs)(y:ys)
@@ -69,6 +69,7 @@ capitalise :: String -> String
 capitalise st = [toUpper(ch) | ch <- st, is_Letter ch]
 
 -- Ex6
+-- itemTotal [ ("a", 5), ("b", 6), ("a", 5), ("a", 7) ]
 add :: (String, Float) -> [(String, Float)] -> [(String, Float)]
 add x [] = [x]
 add x (y:ys)
