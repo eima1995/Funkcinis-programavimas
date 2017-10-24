@@ -3,33 +3,21 @@ where
 import Data.Char
 
 -- Ex1
-{--
 subst :: String -> String -> String -> String
-subst oldSub newSub st 
-    |substring oldSub st == True = newSub ++ (subst1 oldSub st)
-    |otherwise = subst1 oldSub st
+subst[] _ st = st
+subst _ _ [] = []
+subst oldSub newSub st
+    |length(oldSub) > length(st) = st
+    |otherwise = subst1 oldSub newSub st ""
 
-subst1 :: String -> String -> String
-subst1 [] st = st
-subst1 _ [] = []
-subst1 oldSub st 
-    | prefix oldSub st == True = subst1 oldSub (drop (length (oldSub))st)
-    | prefix oldSub st == False = head(st):(subst1 oldSub (tail(st)))
- 
-prefix :: String -> String -> Bool
-prefix[][] = True
-prefix [] _ = True
-prefix _ [] = False
-prefix (x:xs)(y:ys)
-    | x == y = prefix xs ys
-    | otherwise = False
-
-substring :: String -> String -> Bool
-substring _ [] = False
-substring x y
-  | prefix x y == True = True
-  | otherwise = substring x (tail y)
---}
+subst1 :: String -> String -> String -> String -> String
+subst1 oldSub newSub st ats
+    |length(oldSub) > length(st) = ats ++ st
+    |oldSub /= temp = subst1 oldSub newSub (drop 1 st) (ats ++ (take 1 st))
+    |otherwise = subst1 oldSub newSub (drop (length oldSub) st) (ats ++ newSub)
+    where
+     temp = take (length oldSub) st
+    
 -- Ex2
 isPalin :: String -> Bool
 isPalin [] = True
@@ -104,7 +92,7 @@ justify st n
 newLine :: String -> String -> Int -> String
 newLine [] oldSt n = oldSt
 newLine (st:newSt) oldSt n 
-    | elem st spaces = newLine (drop n newSt) (oldSt ++ "\n" ++ (take n newSt)) n
+    | elem st whitespaces = newLine (drop n newSt) (oldSt ++ "\n" ++ (take n newSt)) n
     | otherwise = error "Word exceeds the given line length"
 
 
@@ -119,6 +107,10 @@ newLine (st:newSt) oldSt n
 -- overlaps (Circle 2 (2,2)) (Circle 2 (1,2)) --> True
 -- overlaps (Circle 2 (2,2)) (Rectangle 2 2 (1,1)) --> True
 -- overlaps (Circle 1 (5, 0)) (Circle 1 (3, 0)) --> False
+
+-- overlaps (Circle 1 (8,2)) (Rectangle 2 2 (1,1))
+-- overlaps (Circle 1 (8,2)) (Rectangle 1 1 (6,2)) --Turetu but false
+-- overlaps (Circle 1 (8,2)) (Rectangle 1 1 (6,0)) --Turetu but false
 data Shape = Circle Float (Int,Int)| Rectangle Float Float (Int,Int) deriving (Show, Ord, Eq)
 overlaps :: Shape -> Shape -> Bool
 overlaps (Rectangle w h (x,y)) (Rectangle w1 h1 (x1,y1))
@@ -136,7 +128,7 @@ overlaps (Rectangle w h (x,y)) (Rectangle w1 h1 (x1,y1))
      r2y = fromIntegral y1
 
 overlaps (Circle r1 (x1,y1)) (Circle r2 (x2,y2))
-    | distX + distY < ((r1 + r2) * (r1 + r2)) = True
+    |distX + distY < ((r1 + r2) * (r1 + r2)) = True
     |otherwise = False
     where
      distX = fromIntegral((x1-x2) * (x1-x2))
@@ -144,13 +136,13 @@ overlaps (Circle r1 (x1,y1)) (Circle r2 (x2,y2))
 
 overlaps (Rectangle w h (x2,y2)) (Circle r (x1,y1)) = overlaps (Circle r (x1,y1)) (Rectangle w h (x2,y2))
 overlaps (Circle r (x1,y1)) (Rectangle w h (x2,y2))
-    |distX > (w/2 + r) = False
+    |distX > (w/2 + r) = False -- if the distance is greater than halfCircle + halfRect, then they are too far apart to be colliding
     |distY > (h/2 + r) = False
-    |distX <= w/2 = True
+    |distX <= w/2 = True  -- if the distance is less than halfRect then they are definitely colliding
     |distY <= h/2 = True
     |dx * dx + dy * dy <= r * r = False
     where
-     distX = abs((fromIntegral x1) - (fromIntegral x2) - w/2)
+     distX = abs((fromIntegral x1) - (fromIntegral x2) - w/2) -- distances between the circle’s center and the rectangle’s center
      distY = abs((fromIntegral y1) - (fromIntegral y2) - h/2)
      dx = distX - w/2
      dy = distY - h/2
