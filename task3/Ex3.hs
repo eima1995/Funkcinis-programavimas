@@ -40,7 +40,7 @@ whitespaces = ['\n', '\t', ' ']
 punctuation = ['.', ',', ';', '-', ':' ]
 spaces = whitespaces ++ punctuation
 
--- Ex3  //gale kad nepaskaiciuotu kaip zodzio
+-- Ex3
 count :: String -> (Int, Int, Int)
 count [] = (0,0,0)
 count st = (chars, words, lines)
@@ -86,15 +86,14 @@ justify st n
     | length st < n || n <= 0 = error "Incorect second parameter."
     | otherwise = newLine newSt oldSt n
     where
-        oldSt = take n st -- pradzia zodzio
-        newSt = drop n st -- pabaiga zodzio
+        oldSt = take n st 
+        newSt = drop n st
 
 newLine :: String -> String -> Int -> String
 newLine [] oldSt n = oldSt
 newLine (st:newSt) oldSt n 
-    | elem st whitespaces = newLine (drop n newSt) (oldSt ++ "\n" ++ (take n newSt)) n
-    | otherwise = error "Word exceeds the given line length"
-
+    |length (getWord newSt) > n = error "ERROR"
+    |elem st whitespaces = newLine (drop n newSt) (oldSt ++ "\n" ++ (take n newSt)) n
 
 -- Ex5
 -- overlaps (Rectangle 2 2 (1,1)) (Rectangle 2 2 (1,1)) -> True
@@ -107,10 +106,9 @@ newLine (st:newSt) oldSt n
 -- overlaps (Circle 2 (2,2)) (Circle 2 (1,2)) --> True
 -- overlaps (Circle 2 (2,2)) (Rectangle 2 2 (1,1)) --> True
 -- overlaps (Circle 1 (5, 0)) (Circle 1 (3, 0)) --> False
-
--- overlaps (Circle 1 (8,2)) (Rectangle 2 2 (1,1))
--- overlaps (Circle 1 (8,2)) (Rectangle 1 1 (6,2)) --Turetu but false
--- overlaps (Circle 1 (8,2)) (Rectangle 1 1 (6,0)) --Turetu but false
+-- overlaps (Circle 1 (8,2)) (Rectangle 2 2 (1,1)) --> False
+-- overlaps (Circle 1 (8,2)) (Rectangle 1 1 (6,2)) --> True
+-- overlaps (Circle 1 (8,2)) (Rectangle 1 1 (6,0)) --> False
 data Shape = Circle Float (Int,Int)| Rectangle Float Float (Int,Int) deriving (Show, Ord, Eq)
 overlaps :: Shape -> Shape -> Bool
 overlaps (Rectangle w h (x,y)) (Rectangle w1 h1 (x1,y1))
@@ -132,7 +130,7 @@ overlaps (Circle r1 (x1,y1)) (Circle r2 (x2,y2))
     |otherwise = False
     where
      distX = fromIntegral((x1-x2) * (x1-x2))
-     distY = fromIntegral((y1-y2)*(y1-y2))
+     distY = fromIntegral((y1-y2) * (y1-y2))
 
 overlaps (Rectangle w h (x2,y2)) (Circle r (x1,y1)) = overlaps (Circle r (x1,y1)) (Rectangle w h (x2,y2))
 overlaps (Circle r (x1,y1)) (Rectangle w h (x2,y2))
@@ -140,44 +138,41 @@ overlaps (Circle r (x1,y1)) (Rectangle w h (x2,y2))
     |distY > (h/2 + r) = False
     |distX <= w/2 = True  -- if the distance is less than halfRect then they are definitely colliding
     |distY <= h/2 = True
-    |dx * dx + dy * dy <= r * r = False
+    |otherwise = dx * dx + dy * dy <= r * r
     where
-     distX = abs((fromIntegral x1) - (fromIntegral x2) - w/2) -- distances between the circle’s center and the rectangle’s center
+     distX = abs((fromIntegral x1) - (fromIntegral x2) - w/2)
      distY = abs((fromIntegral y1) - (fromIntegral y2) - h/2)
      dx = distX - w/2
      dy = distY - h/2
 
 -- Ex6
--- loan (Person "Eimantas")(Book "knyga") ([(Book1 "knyga1" 81 Free),(Book1 "knyga" 45 Free),(Book1 "knyga2" 99 Loaned)],[Loan (Person "Tomas") (Book2 "knyga2" 99)])
--- loan (Person "Eimantas")(Book "knyga100") ([(Book1 "knyga1" 81 Free),(Book1 "knyga" 45 Free),(Book1 "knyga2" 99 Loaned)],[Loan (Person "Tomas") (Book2 "knyga2" 99)])
--- loan (Person "Eimantas")(Book "knyga1") ([(Book1 "knyga1" 81 Locked),(Book1 "knyga" 45 Free),(Book1 "knyga2" 99 Loaned)],[Loan (Person "Tomas") (Book2 "knyga2" 99)])
+-- loan (Person "Eimantas") "knyga" ([(Book "knyga1" 81 Free),(Book "knyga" 45 Free)],[Loan (Person "Tomas") "knyga2" 99])
 type Name = String
 type Id = Int 
 data Person = Person Name deriving (Show, Eq)
-data Book = Book Name | Book1 Name Id Status | Book2 Name Id deriving (Show, Eq)
+data Book = Book Name Id Status deriving (Show, Eq)
 data Status = Loaned | Free | Locked deriving (Show, Eq)
-data Loan = Loan Person Book deriving (Show, Eq)
+data Loan = Loan Person Name Id deriving (Show, Eq)
 
-loan :: Person -> Book -> ([Book],[Loan]) -> ([Book],[Loan])
-loan person (Book bookName) (xs, ys) = goThroughBooks person bookName xs ys []
+loan :: Person -> String -> ([Book],[Loan]) -> ([Book],[Loan])
+loan person bookName (xs, ys) = goThroughBooks person bookName xs ys []
 
 goThroughBooks :: Person -> String -> [Book] -> [Loan] -> [Book] -> ([Book],[Loan])
--- goThroughBooks _ _ [] _ _ = (temp, xs)
 goThroughBooks person bookName (y:ys) xs temp
     |findBook bookName y  == True = ((reverse(temp) ++ (changeSt y):ys), addPerson person bookName (getBookID y) xs)
     |ys == [] = (reverse((y:temp)), xs) 
     |otherwise = goThroughBooks person bookName ys xs (y:temp)
 
 findBook :: String -> Book -> Bool
-findBook bookName (Book1 name id1 st)
+findBook bookName (Book name id st)
     |((bookName == name) && (st == Free)) = True
     |otherwise = False
 
 changeSt :: Book -> Book
-changeSt (Book1 name id st) = (Book1 name id Loaned)
+changeSt (Book name id st) = (Book name id Loaned)
 
 getBookID :: Book -> Int
-getBookID (Book1 name id st) = id
+getBookID (Book name id st) = id
 
 addPerson :: Person -> String -> Int -> [Loan] -> [Loan]
-addPerson person bookName id ys = (Loan person (Book2 bookName id)):ys
+addPerson person bookName id ys = (Loan person bookName id):ys
