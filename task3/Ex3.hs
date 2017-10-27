@@ -69,8 +69,7 @@ dropSpaces (x:xs)
 
 splitWords :: String -> [String]
 splitWords [] = []
-splitWords st =
-    (getWord new_st) : splitWords(dropWord new_st)
+splitWords st = (getWord new_st) : splitWords(dropWord new_st)
     where
        new_st = dropSpaces st
 
@@ -81,19 +80,22 @@ getLinesNum (x:xs) num
     | otherwise = getLinesNum xs (num + 1)
 
 -- Ex4
-justify :: String -> Int -> String
-justify st n
-    | length st < n || n <= 0 = error "Incorect second parameter."
-    | otherwise = newLine newSt oldSt n
-    where
-        oldSt = take n st 
-        newSt = drop n st
+deleteEnters :: String -> String
+deleteEnters[] = []
+deleteEnters (s:st)
+    |s /= '\n' = s:deleteEnters st
+    |otherwise = deleteEnters st
 
-newLine :: String -> String -> Int -> String
-newLine [] oldSt n = oldSt
-newLine (st:newSt) oldSt n 
-    |length (getWord newSt) > n = error "ERROR"
-    |elem st whitespaces = newLine (drop n newSt) (oldSt ++ "\n" ++ (take n newSt)) n
+justify:: String -> Int -> String
+justify st n = check (deleteEnters st) (splitWords st) n n
+ 
+check:: String -> [String] -> Int -> Int -> String
+check [] [] _ _ = []  
+check (x:xs) (y:ys) n currentCount
+    |length y > n  = error "Error!"
+    |elem x spaces && (currentCount > 0) = x : check xs (y:ys) n (currentCount - 1)
+    |length y <= currentCount = y ++ check (drop (length y) (x:xs)) ys n (currentCount - (length y))
+    |otherwise  = '\n': check (x:xs) (y:ys) n n
 
 -- Ex5
 -- overlaps (Rectangle 2 2 (1,1)) (Rectangle 2 2 (1,1)) -> True
