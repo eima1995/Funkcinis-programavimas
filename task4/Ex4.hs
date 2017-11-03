@@ -19,30 +19,30 @@ all1 p x
     |otherwise = False
 
 any2 p x = foldr (||) False (map p x)
-all2 p x = foldr (||) False (map p x)
+all2 p x = foldr (&&) False (map p x)
 
 -- Ex3
---unzip1 [(1,2),(2,3),(3,4)]
-unzip1 xs = foldr f x xs
+unzip1 xs = (map fst xs, map snd xs)
+
+-- Ex4
+ff maxNum = sum . filter(>0) . map(*10)
+
+sum1 p x = foldr (+) 0 (map p x)
+
+-- Ex5
+flip1 f = \x y -> f y x  
+
+-- Ex6
+
+-- Ex7
+
+
+-- Ex8
+split1 xs = foldr f x xs
   where
    f (x,y)(xs,ys) = (x:xs, y:ys)
    x = ([],[])
 
--- Ex4
-ff maxNum = sum1 . filter(>0) . map(*10)
-{--   where
-    sum1 x = foldr (+) 0 . map(\x -> 1)
---}
-sum1 = foldr (+) 0 . map(\x -> x)
-{--
-rev ::  [a] -> a
-rev xs = foldr snoc x xs
-snoc ::  a -> [a] -> a
-snoc y x:xs
-	| y < 10 = y + x
-	|otherwise = y
---}
--- Ex5
-flip1 f = \x y -> f y x  
+
 
  
